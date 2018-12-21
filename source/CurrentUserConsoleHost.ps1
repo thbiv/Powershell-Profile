@@ -1,7 +1,7 @@
 #############################################################
 #############################################################
 # Variables
-New-Variable -Name PSProfileScriptPath -Value $(Split-Path $Profile) -Option Constant -Scope Global
+New-Variable -Name PSProfileScriptPath -Value $(Split-Path $Profile) -Option Constant -Scope Script
 New-Variable -Name TranscriptPath -Value "$HOME\Documents\Transcript" -Scope Script
 New-Variable -Name PSScripts -Option Constant -Scope Global -Value @{
     CurrentUser = "$PSProfileScriptPath\Scripts"
@@ -10,9 +10,7 @@ New-Variable -Name PSScripts -Option Constant -Scope Global -Value @{
 #############################################################
 #############################################################
 # PSDrives
-If (!(Test-Path -Path P:\)) {
-    New-PSDrive -Name P -PSProvider FileSystem -Persist -Root "\\sfhrsfile01\horsham-home\thomasb\PSProjects" -Description 'Powershell Projects' | Out-Null
-}
+New-PSDrive -Name PSProjects -PSProvider FileSystem -Root "$HOME\Documents\PSProjects" -Description 'Powershell Projects' | Out-Null
 #############################################################
 #############################################################
 # Aliases
@@ -53,17 +51,6 @@ $Console.WindowSize = $ConsoleSize
 #############################################################
 # PSReadline Settings
 Set-PSReadlineOption -EditMode Windows
-$Params = @{
-    'Chord' = 'Ctrl+d'
-    'BriefDescription' = 'los -locked -LockedDC sfhrsdc01'
-    'Description' = 'Check ActiveDirecotry and display locked user accounts'
-}
-Set-PSReadlineKeyHandler @Params -ScriptBlock {
-    Param($key, $arg)
-    [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
-    [Microsoft.PowerShell.PSConsoleReadLine]::Insert('los -locked -LockedDC sfhrsdc01')
-    [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
-}
 $Params = @{
     'Chord' = 'Ctrl+f'
     'BriefDescription' = 'gci -Force | Format-Wide -Column 3'
@@ -119,33 +106,6 @@ Function Get-ColoredDir {
     $host.ui.rawui.foregroundColor = $origFg
 }
 New-Alias -Name LL -Value Get-ColoredDir
-Function Connect-ToExchange {
-    $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri http://SFHOUEX16MB01.selene1.fsroot.com/PowerShell/ -Authentication Kerberos -Name Exchange
-    Import-PSSession $Session -AllowClobber -DisableNameChecking | Out-Null
-    $Host.UI.RawUI.WindowTitle = "Exchange Powershell Console"
-}
-New-Alias -Name cte -Value Connect-ToExchange
-Function Disconnect-FromExchange {
-	Get-PSSession | Where-Object {$_.Name -eq 'Exchange'} | Remove-PSSession
-	$Host.UI.RawUI.WindowTitle = 'Windows Powershell'
-}
-New-Alias -Name dfe -Value Disconnect-FromExchange -Force
-Function Connect-ToOffice365 {
-    $msolcred = Get-Credential
-    Connect-MsolService -Credential $msolcred
-}
-New-Alias -Name cto365 -Value Connect-ToOffice365
-Function Connect-ToExchangeOnline {
-    $LiveCred = Get-Credential
-    $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell-liveid/ -Credential $LiveCred -Authentication Basic -AllowRedirection -Name ExchangeOnline
-    Import-PSSession $Session -DisableNameChecking
-}
-New-Alias -Name cteo -Value Connect-ToExchangeOnline
-Function Disconnect-FromExchangeOnline {
-	Get-PSSession | Where-Object {$_.Name -eq 'ExchangeOnline'} | Remove-PSSession
-	$Host.UI.RawUI.WindowTitle = 'Windows Powershell'
-}
-New-Alias -Name dfeo -Value Disconnect-FromExchangeOnline -Force
 #############################################################
 #############################################################
 $TranscriptFile = Join-Path -Path $TranscriptPath -ChildPath ("Transcript_{0:yyyMMddTHHmmss}.txt" -f $(Get-Date))

@@ -2,7 +2,6 @@
 #############################################################
 # Variables
 New-Variable -Name PSProfileScriptPath -Value $(Split-Path $Profile) -Option Constant -Scope Script
-New-Variable -Name TranscriptPath -Value "$HOME\Documents\Transcript" -Scope Script
 New-Variable -Name PSScripts -Option Constant -Scope Global -Value @{
     CurrentUser = "$PSProfileScriptPath\Scripts"
     AllUsers = "$Env:ProgramFiles" + "\WindowsPowershell\Scripts"
@@ -108,5 +107,3 @@ Function Get-ColoredDir {
 New-Alias -Name LL -Value Get-ColoredDir
 #############################################################
 #############################################################
-$TranscriptFile = Join-Path -Path $TranscriptPath -ChildPath ("Transcript_{0:yyyMMddTHHmmss}.txt" -f $(Get-Date))
-Start-Transcript -Path $TranscriptFile -Force -NoClobber -IncludeInvocationHeader

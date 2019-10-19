@@ -8,10 +8,6 @@ New-Variable -Name PSScripts -Option Constant -Scope Global -Value @{
 }
 #############################################################
 #############################################################
-# PSDrives
-New-PSDrive -Name PSProjects -PSProvider FileSystem -Root "$HOME\Documents\PSProjects" -Description 'Powershell Projects' | Out-Null
-#############################################################
-#############################################################
 # Aliases
 New-Alias plink "C:\Program Files\PuTTY\plink.exe" #PuTTy CLI
 New-Alias npp   "C:\Program Files\Notepad++\notepad++.exe" #Notepad++

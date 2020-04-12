@@ -32,18 +32,6 @@ Import-Module -Name Pscx -Function help, less, Show-Tree, Start-PowerShell -Cmdl
 Import-Module -Name PowerShellCookbook -Function Show-Object
 #############################################################
 #############################################################
-# Console Configuration
-$Console = $Host.UI.RawUI
-$ConsoleBuffer = $Console.BufferSize
-$ConsoleBuffer.Width = 180
-$ConsoleBuffer.Height = 3000
-$Console.BufferSize = $ConsoleBuffer
-$ConsoleSize = $Console.WindowSize
-$ConsoleSize.Width = 180
-$ConsoleSize.Height = 60
-$Console.WindowSize = $ConsoleSize
-#############################################################
-#############################################################
 # PSReadline Settings
 Set-PSReadlineOption -EditMode Windows
 $Params = @{

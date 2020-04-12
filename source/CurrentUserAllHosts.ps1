@@ -1,10 +1,10 @@
-# Register LocalGallery if it does not exist
-If (!(Get-PSRepository -Name LocalGallery -ErrorAction SilentlyContinue)) {
-    $LocalGalleryPath = "$Env:ProgramFiles" + "\WindowsPowershell\LocalGallery"
+# Register PSLocalGallery if it does not exist
+If (!(Get-PSRepository -Name PSLocalGallery -ErrorAction SilentlyContinue)) {
+    $PSLocalGalleryPath = "C:\ProgramData\PSLocaLGallery\Repository"
     $Repo = @{
-        Name = 'LocalGallery'
-        SourceLocation = $LocalGalleryPath
-        PublishLocation = $LocalGalleryPath
+        Name = 'PSLocalGallery'
+        SourceLocation = $PSLocalGalleryPath
+        PublishLocation = $PSLocalGalleryPath
         InstallationPolicy = 'Trusted'
     }
     Register-PSRepository @Repo

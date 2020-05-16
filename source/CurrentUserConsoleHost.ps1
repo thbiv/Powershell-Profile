@@ -40,7 +40,7 @@ $Params = @{
     'Description' = 'Displays list of files and folders in 3 columns'
 }
 Set-PSReadlineKeyHandler @Params -ScriptBlock {
-    Param($key, $arg)
+    #Param($key, $arg)
     [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
     [Microsoft.PowerShell.PSConsoleReadLine]::Insert('gci -force | Format-Wide -Column 3')
     [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
@@ -89,5 +89,10 @@ Function Get-ColoredDir {
     $host.ui.rawui.foregroundColor = $origFg
 }
 New-Alias -Name LL -Value Get-ColoredDir
+Function Install-Powershell {
+    If (([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+        Invoke-Expression "&{$(Invoke-RestMethod https://aka.ms/install-powershell.ps1)} -UseMSI"
+    }
+}
 #############################################################
 #############################################################

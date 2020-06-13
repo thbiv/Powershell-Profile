@@ -91,7 +91,7 @@ Function Get-ColoredDir {
 New-Alias -Name LL -Value Get-ColoredDir
 Function Install-Powershell {
     If (([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-        Invoke-Expression "&{$(Invoke-RestMethod https://aka.ms/install-powershell.ps1)} -UseMSI"
+        Invoke-Expression "&{$(Invoke-RestMethod https://aka.ms/install-powershell.ps1)} -UseMSI -Quiet"
     }
 }
 #############################################################

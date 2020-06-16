@@ -1,3 +1,5 @@
+using namespace System.Management.Automation
+using namespace System.Management.Automation.Language
 #############################################################
 #############################################################
 # Variables
@@ -178,7 +180,7 @@ Set-PSReadLineKeyHandler -Key '"',"'" `
     }
 
     if ($token.Extent.StartOffset -eq $cursor) {
-        if ($token.Kind -eq [TokenKind]::Generic -or $token.Kind -eq [TokenKind]::Identifier -or 
+        if ($token.Kind -eq [TokenKind]::Generic -or $token.Kind -eq [TokenKind]::Identifier -or
             $token.Kind -eq [TokenKind]::Variable -or $token.TokenFlags.hasFlag([TokenFlags]::Keyword)) {
             $end = $token.Extent.EndOffset
             $len = $end - $cursor
@@ -212,7 +214,7 @@ Set-PSReadLineKeyHandler -Key '(','{','[' `
     $line = $null
     $cursor = $null
     [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
-    
+
     if ($selectionStart -ne -1)
     {
       # Text is selected, wrap it in brackets
@@ -242,6 +244,42 @@ Set-PSReadLineKeyHandler -Key ')',']','}' `
     else
     {
         [Microsoft.PowerShell.PSConsoleReadLine]::Insert("$($key.KeyChar)")
+    }
+}
+
+Set-PSReadLineKeyHandler -Key Backspace `
+                         -BriefDescription SmartBackspace `
+                         -LongDescription "Delete previous character or matching quotes/parens/braces" `
+                         -ScriptBlock {
+    param($key, $arg)
+
+    $line = $null
+    $cursor = $null
+    [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
+
+    if ($cursor -gt 0)
+    {
+        $toMatch = $null
+        if ($cursor -lt $line.Length)
+        {
+            switch ($line[$cursor])
+            {
+                <#case#> '"' { $toMatch = '"'; break }
+                <#case#> "'" { $toMatch = "'"; break }
+                <#case#> ')' { $toMatch = '('; break }
+                <#case#> ']' { $toMatch = '['; break }
+                <#case#> '}' { $toMatch = '{'; break }
+            }
+        }
+
+        if ($toMatch -ne $null -and $line[$cursor-1] -eq $toMatch)
+        {
+            [Microsoft.PowerShell.PSConsoleReadLine]::Delete($cursor - 1, 2)
+        }
+        else
+        {
+            [Microsoft.PowerShell.PSConsoleReadLine]::BackwardDeleteChar($key, $arg)
+        }
     }
 }
 

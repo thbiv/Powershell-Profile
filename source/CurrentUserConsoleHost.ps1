@@ -6,7 +6,7 @@ using namespace System.Management.Automation.Language
 New-Variable -Name PSProfileScriptPath -Value $(Split-Path $Profile) -Option Constant -Scope Script
 New-Variable -Name PSScripts -Option Constant -Scope Global -Value @{
     CurrentUser = "$PSProfileScriptPath\Scripts"
-    AllUsers = "$Env:ProgramFiles" + "\WindowsPowershell\Scripts"
+    AllUsers = "$Env:ProgramFiles" + "\Powershell\Scripts"
 }
 #############################################################
 #############################################################
@@ -22,9 +22,9 @@ Function Prompt {
 	}
     Write-Host "$(Get-Date -Format 'yyyyMMdd | HH:mm:ss') " -NoNewline
     Write-Host ("$env:USERNAME" + '@' + "$env:COMPUTERNAME ") -NoNewline -ForegroundColor DarkGray
-    Write-Host ($(Get-Location))
+    Write-Host $($executionContext.SessionState.Path.CurrentLocation)
     Write-Host (Get-ChildItem).Count -NoNewline
-	' PS> '
+	" PS{0} " -f $('>' * ($nestedPromptLevel + 1))
 }
 #############################################################
 #############################################################

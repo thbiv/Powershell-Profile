@@ -33,7 +33,7 @@ Import-Module -Name PowerShellCookbook -Function Show-Object
 #############################################################
 #############################################################
 # Load PSReadLine Profile
-. .\PSReadlineProfile.ps1
+. $PSProfileScriptPath\PSReadlineProfile.ps1
 #############################################################
 #############################################################
 # Profile Functions

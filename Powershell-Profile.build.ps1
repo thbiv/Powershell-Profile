@@ -1,12 +1,13 @@
-$Script:ProjectName = 'Powershell-Profile'
+$Script:ProjectName = Split-Path -Path $PSScriptRoot -Leaf
 $Script:SourceRoot = "$BuildRoot\source"
 $Script:OutputRoot = "$BuildRoot\_output"
 $Script:TestResultsRoot = "$BuildRoot\_testresults"
 $Script:TestsRoot = "$BuildRoot\tests"
 $Script:FileHashRoot = "$BuildRoot\_filehash"
 $Script:DestinationScript = "$OutputRoot\$ScriptFileName"
+$Script:ScriptConfig = [xml]$(Get-Content -Path '.\Script.Config.xml')
 
-Task . Clean, Build, Test, Hash, Deploy
+Task . Clean, Build, Test, Deploy
 Task Testing Clean, Build, Test
 
 # Synopsis: Empty the _output and _testresults folders
@@ -21,8 +22,18 @@ Task Clean {
 
 # Synopsis: Compile and build the project
 Task Build {
-    Copy-Item -Path "$SourceRoot\CurrentUserConsoleHost.ps1" -Destination "$OutputRoot\CurrentUserConsoleHost.ps1"
-    Copy-Item -Path "$SourceRoot\CurrentUserAllHosts.ps1" -Destination "$OutputRoot\CurrentUserAllHosts.ps1"
+    $Version = [version]$($ScriptConfig.config.info.scriptversion)
+    $MajorVersion = $($Version.Major)
+    $MinorVersion = $($Version.Minor)
+    $NewVersion = "{0}.{1}.{2}" -f $MajorVersion,$MinorVersion,$($Version.Build + 1)
+    $ScriptConfig.config.info.scriptversion = $NewVersion
+    $ScriptConfig.Save('Script.Config.xml')
+
+    "# Project:       $ProjectName" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
+    "# Author:      $($ScriptConfig.config.info.author)" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
+    "# Version:     $NewVersion" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
+    "# Description: $($ScriptConfig.config.info.description)" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
+    Get-Content -Path "$SourceRoot\CurrentUserConsoleHost.ps1" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"    
 }
 
 # Synopsis: Test the Project
@@ -44,19 +55,7 @@ Task Test {
     Else {Write-Host "All tests have passed...Build can continue."}
 }
 
-# Synopsis: Produce File Hash for all output files
-Task Hash {
-    $Files = Get-ChildItem -Path $OutputRoot -File -Recurse
-    $HashOutput = @()
-    ForEach ($File in $Files) {
-        $HashOutput += Get-FileHash -Path $File.fullname
-    }
-    $HashExportFile = "Files_Hash_Powershell-Profile.xml"
-    $HashOutput | Export-Clixml -Path "$FileHashRoot\$HashExportFile" -Force
-    Write-Host "Hash Information File: $HashExportFile"
-}
-
 # Synopsis: Deploy Powershell Profiles
 Task Deploy {
-    Invoke-PSDeploy -Force -Verbose
+    Invoke-PSDeploy -Force
 }

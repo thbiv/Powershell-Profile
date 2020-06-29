@@ -1,5 +1,15 @@
 #############################################################
 #############################################################
+# Import Modules
+Import-Module -Name PSReadLine
+Import-Module -Name Pscx -Function help, less, Show-Tree, Start-PowerShell -Cmdlet ConvertFrom-Base64, ConvertTo-Base64
+Import-Module -Name PowerShellCookbook -Function Show-Object
+#############################################################
+#############################################################
+# Add to PATH
+Add-PathVariable 'C:\ProgramData\chocolatey\lib\gsudo\bin\'
+#############################################################
+#############################################################
 # Variables
 New-Variable -Name PSProfileScriptPath -Value $(Split-Path $Profile) -Option Constant -Scope Script
 New-Variable -Name PSScripts -Option Constant -Scope Global -Value @{
@@ -26,17 +36,13 @@ Function Prompt {
 }
 #############################################################
 #############################################################
-# Import Modules
-Import-Module -Name PSReadLine
-Import-Module -Name Pscx -Function help, less, Show-Tree, Start-PowerShell -Cmdlet ConvertFrom-Base64, ConvertTo-Base64
-Import-Module -Name PowerShellCookbook -Function Show-Object
-#############################################################
-#############################################################
 # Load PSReadLine Profile
 . $PSProfileScriptPath\PSReadlineProfile.ps1
 #############################################################
 #############################################################
 # Profile Functions
+
+Function GoAdmin {gsudo pwsh -nologo }
 Function New-PSRemoteSession {
     [CmdletBinding(SupportsShouldProcess)]
     Param (

@@ -19,7 +19,7 @@ New-Variable -Name PSScripts -Option Constant -Scope Global -Value @{
 #############################################################
 #############################################################
 # Aliases
-New-Alias plink "C:\Program Files\PuTTY\plink.exe" #PuTTy CLI
+New-Alias sudo "gsudo"
 New-Alias npp   "C:\Program Files\Notepad++\notepad++.exe" #Notepad++
 #############################################################
 #############################################################
@@ -67,8 +67,24 @@ If (([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::
 #############################################################
 #############################################################
 # Profile Functions
+Function Get-PwshLatestRelease {
+    $Params = @{
+        'Uri' = 'https://api.github.com/repos/Powershell/Powershell/releases/latest'
+        'Headers' = @{"Accept"="application/json"}
+        'Method' = 'Get'
+        'UseBasicParsing' = $True
+    }
+    $Response = Invoke-RestMethod @Params
+    $Winx64Asset = $Response.assets | Where-Object {$_.name -like "*win-x64.zip"}
 
-Function GoAdmin {gsudo pwsh -nologo }
+    $Props = [ordered]@{
+        'Name' = $($Response.name)
+        'Version' = $(($Response.tag_name).TrimStart('v'))
+        'PublishedDate' = $($Response.published_at)
+        'DownloadURL' = $($Winx64Asset.browser_download_url)
+    }
+    New-Object -TypeName PSObject -Property $Props
+}
 Function New-PSRemoteSession {
     [CmdletBinding(SupportsShouldProcess)]
     Param (

@@ -30,7 +30,7 @@ $GitPromptSettings.DefaultPromptSuffix.text = ""
 # Prompt
 Function Prompt {
     $Prompt = @()
-    If ($GitPromptValues.IsAdmin -eq $True) {
+    If (([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
 		$Prompt += Write-Prompt '[Admin]' -ForegroundColor ([ConsoleColor]::Red)
 	}
     $Prompt += Write-Prompt "$(Get-Date -Format 'yyyyMMdd | HH:mm:ss')"

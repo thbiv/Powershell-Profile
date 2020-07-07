@@ -1,7 +1,7 @@
 #############################################################
 #############################################################
 # Import Modules
-Import-Module -Name PSReadLine
+Import-Module -Name PSReadLine, posh-git
 Import-Module -Name Pscx -Function help, less, Show-Tree, Start-PowerShell -Cmdlet ConvertFrom-Base64, ConvertTo-Base64
 Import-Module -Name PowerShellCookbook -Function Show-Object
 #############################################################
@@ -23,16 +23,24 @@ New-Alias sudo "gsudo"
 New-Alias npp   "C:\Program Files\Notepad++\notepad++.exe" #Notepad++
 #############################################################
 #############################################################
+# Posh-Git Settings
+$GitPromptSettings.DefaultPromptSuffix.text = ""
+#############################################################
+#############################################################
 # Prompt
 Function Prompt {
-	If (([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-		Write-Host '[Admin]' -NoNewline -ForegroundColor Red
+    $Prompt = @()
+    If (([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+		$Prompt += Write-Prompt '[Admin]' -ForegroundColor ([ConsoleColor]::Red)
 	}
-    Write-Host "$(Get-Date -Format 'yyyyMMdd | HH:mm:ss') " -NoNewline
-    Write-Host ("$env:USERNAME" + '@' + "$env:COMPUTERNAME ") -NoNewline -ForegroundColor DarkGray
-    Write-Host $($executionContext.SessionState.Path.CurrentLocation)
-    Write-Host (Get-ChildItem).Count -NoNewline
-	" PS{0} " -f $('>' * ($nestedPromptLevel + 1))
+    $Prompt += Write-Prompt "$(Get-Date -Format 'yyyyMMdd | HH:mm:ss')"
+    $Prompt += Write-Prompt ("$env:USERNAME" + '@' + "$env:COMPUTERNAME") -ForegroundColor ([ConsoleColor]::DarkGray)
+    #Write-Host $($executionContext.SessionState.Path.CurrentLocation)
+    $Prompt += & $GitPromptScriptBlock
+    $Prompt += Write-Prompt "`n"
+    $Prompt += Write-Prompt (Get-ChildItem).Count
+    $Prompt += Write-Prompt ("PS" + "$(">" * ($nestedPromptLevel + 1)) ")
+    if ($Prompt) {"$Prompt"} else {""}
 }
 #############################################################
 #############################################################

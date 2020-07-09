@@ -25,6 +25,7 @@ New-Alias npp   "C:\Program Files\Notepad++\notepad++.exe" #Notepad++
 #############################################################
 # Posh-Git Settings
 $GitPromptSettings.DefaultPromptSuffix.text = ""
+$GitPromptSettings.WindowTitle = ""
 #############################################################
 #############################################################
 # Prompt

@@ -75,6 +75,13 @@ If (([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::
 #############################################################
 #############################################################
 # Profile Functions
+For($i = 1; $i -le 5; $i++){
+    $u =  "".PadLeft($i,"u")
+    $unum =  "u$i"
+    $d =  $u.Replace("u","../")
+    Invoke-Expression "Function $u { Push-Location $d }"
+    Invoke-Expression "Function $unum { Push-Location $d }"
+}
 Function Get-PwshLatestRelease {
     $Params = @{
         'Uri' = 'https://api.github.com/repos/Powershell/Powershell/releases/latest'

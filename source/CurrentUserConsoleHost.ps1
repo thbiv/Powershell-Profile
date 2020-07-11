@@ -36,16 +36,19 @@ $GitPromptSettings.WindowTitle = ""
 # Custom Prompt
 Function Prompt {
     $Prompt = @()
-    If ($IsAdmin) {
-		$Prompt += Write-Prompt '[Admin]' -ForegroundColor ([ConsoleColor]::Red)
-	}
-    $Prompt += Write-Prompt "$(Get-Date -Format 'yyyyMMdd | HH:mm:ss')"
-    $Prompt += Write-Prompt ("$env:USERNAME" + '@' + "$env:COMPUTERNAME") -ForegroundColor ([ConsoleColor]::DarkGray)
-    $Prompt += & $GitPromptScriptBlock
+    $Prompt += Write-Prompt "$(Get-Date -Format 'MM/dd/yyyy HH:mm:ss')" -ForegroundColor ([ConsoleColor]::White) -BackgroundColor ([ConsoleColor]::Blue)
+    $Prompt += Write-Prompt ("$env:USERNAME" + '@' + "$env:COMPUTERNAME") -ForegroundColor ([ConsoleColor]::Gray) -BackgroundColor ([ConsoleColor]::DarkYellow)
+    $Prompt += Write-Prompt $($executionContext.SessionState.Path.CurrentLocation) -ForegroundColor ([ConsoleColor]::Black) -BackgroundColor ([ConsoleColor]::White)
     $Prompt += Write-Prompt "`n"
+    If ($IsAdmin) {
+		$Prompt += Write-Prompt 'Admin' -ForegroundColor ([ConsoleColor]::White) -BackgroundColor ([ConsoleColor]::Red)
+    }
     $Prompt += Write-Prompt (Get-ChildItem).Count
+    If (Get-GitDirectory -ne $Null) {
+        $Prompt += Write-Prompt (Write-VcsStatus)
+    }
     $Prompt += Write-Prompt ("PS" + "$(">" * ($nestedPromptLevel + 1)) ")
-    if ($Prompt) {"$Prompt"} else {""}
+    If ($Prompt) {"$Prompt"} Else {""}
 }
 
 # Load PSReadLine Profile

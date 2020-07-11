@@ -16,6 +16,9 @@ New-Variable -Name PSScripts -Option Constant -Scope Global -Value @{
     AllUsers = "$Env:ProgramFiles" + "\Powershell\Scripts"
 }
 
+#Variable for checking if this session has Administrator access
+New-Variable -Name IsAdmin -Option Constant -Scope Global -Value $(([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
+
 # Aliases
 # calling the gsudo tool with 'sudo'
 New-Alias sudo "gsudo"
@@ -33,7 +36,7 @@ $GitPromptSettings.WindowTitle = ""
 # Custom Prompt
 Function Prompt {
     $Prompt = @()
-    If (([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    If ($IsAdmin) {
 		$Prompt += Write-Prompt '[Admin]' -ForegroundColor ([ConsoleColor]::Red)
 	}
     $Prompt += Write-Prompt "$(Get-Date -Format 'yyyyMMdd | HH:mm:ss')"
@@ -75,7 +78,7 @@ If (([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::
 # Profile Functions
 # Create functions for moving up the directory tree
 # https://matthewmanela.com/blog/quickly-moving-up-a-directory-tree/
-For($i = 1; $i -le 5; $i++){
+For ($i = 1; $i -le 5; $i++) {
     $u =  "".PadLeft($i,"u")
     $unum =  "u$i"
     $d =  $u.Replace("u","../")

@@ -27,28 +27,29 @@ New-Alias sudo "gsudo"
 New-Alias npp   "C:\Program Files\Notepad++\notepad++.exe" #Notepad++
 
 # Posh-Git Settings
-# Set the Posh-Git Prompt Suffix to nothing since the current directory is not where the prompt will be.
-$GitPromptSettings.DefaultPromptSuffix.text = ""
-
-# Set the Posh-Git Window Title to nothing so it does not change the default window title.
 $GitPromptSettings.WindowTitle = ""
+$GitPromptSettings.ShowStatusWhenZero = $false
 
 # Custom Prompt
 Function Prompt {
-    $Prompt = @()
-    $Prompt += Write-Prompt "$(Get-Date -Format 'MM/dd/yyyy HH:mm:ss')" -ForegroundColor ([ConsoleColor]::White) -BackgroundColor ([ConsoleColor]::Blue)
-    $Prompt += Write-Prompt ("$env:USERNAME" + '@' + "$env:COMPUTERNAME") -ForegroundColor ([ConsoleColor]::Gray) -BackgroundColor ([ConsoleColor]::DarkYellow)
-    $Prompt += Write-Prompt $($executionContext.SessionState.Path.CurrentLocation) -ForegroundColor ([ConsoleColor]::Black) -BackgroundColor ([ConsoleColor]::White)
-    $Prompt += Write-Prompt "`n"
     If ($IsAdmin) {
-		$Prompt += Write-Prompt 'Admin' -ForegroundColor ([ConsoleColor]::White) -BackgroundColor ([ConsoleColor]::Red)
+        Write-Host "Admin" -ForegroundColor White -BackgroundColor Red -NoNewline
+        Write-Host " " -NoNewline
     }
-    $Prompt += Write-Prompt (Get-ChildItem).Count
+    Write-Host "$(Get-Date -Format 'MM/dd/yyyy HH:mm:ss')" -ForegroundColor White -BackgroundColor Blue -NoNewline
+    Write-Host " " -NoNewline
+    Write-Host ("$env:USERNAME" + '@' + "$env:COMPUTERNAME") -ForegroundColor White -BackgroundColor DarkGray -NoNewline
     If (Get-GitDirectory -ne $Null) {
-        $Prompt += Write-Prompt (Write-VcsStatus)
+        Write-Host " " -NoNewline
+        Write-Host "$((Get-GitStatus).RepoName)" -ForegroundColor White -BackgroundColor DarkGreen -NoNewline
+        Write-Host "$(Write-VcsStatus)"
+    } Else {
+        Write-Host ""
     }
-    $Prompt += Write-Prompt ("PS" + "$(">" * ($nestedPromptLevel + 1)) ")
-    If ($Prompt) {"$Prompt"} Else {""}
+    Write-Host $((Get-Location).Path) -ForegroundColor Yellow
+    Write-Host "$((Get-ChildItem).Count)" -ForegroundColor Blue -NoNewline
+    Write-Host " " -NoNewline
+    "PS> "
 }
 
 # Load PSReadLine Profile
@@ -67,7 +68,7 @@ If (!(Get-PSRepository -Name PSLocalGallery -ErrorAction SilentlyContinue)) {
 }
 
 # Update Help if Administrator
-If (([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+If ($IsAdmin) {
 	Start-Job -Name 'Update PS Help' -ScriptBlock {
         Try {Update-Help -Force -ErrorAction Stop}
         Catch {
@@ -160,5 +161,20 @@ New-Alias -Name LL -Value Get-ColoredDir
 Function Install-Powershell {
     If (([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
         Invoke-Expression "&{$(Invoke-RestMethod https://aka.ms/install-powershell.ps1)} -UseMSI -Quiet"
+    }
+}
+
+# Check if there is a newer version of Powershell available and ask to install if there is.
+If ($($Host.Version) -ne $((Get-PwshLatestRelease).Version)) {
+    Write-Host "A new version of Powershell is available: $((Get-PwshLatestRelease).Version)"
+    $Yes = New-Object System.Management.Automation.Host.ChoiceDescription '&Yes'
+    $No = New-Object System.Management.Automation.Host.ChoiceDescription '&No'
+    $Options = [System.Management.Automation.Host.ChoiceDescription[]]($Yes, $No)
+    $Title = 'Install Powershell'
+    $Message = 'Do you want to Install the new veriosn of Powershell?'
+    $Result = $host.ui.PromptForChoice($Title, $Message, $Options, 0)
+    Switch ($Result) {
+        0 { & Sudo Install-Powershell }
+        1 {}
     }
 }

@@ -22,16 +22,14 @@ Task Clean {
 
 # Synopsis: Compile and build the project
 Task Build {
-    $Version = [version]$($ScriptConfig.config.info.scriptversion)
-    $MajorVersion = $($Version.Major)
-    $MinorVersion = $($Version.Minor)
-    $NewVersion = "{0}.{1}.{2}" -f $MajorVersion,$MinorVersion,$($Version.Build + 1)
-    $ScriptConfig.config.info.scriptversion = $NewVersion
+    [int]$Version = $($ScriptConfig.config.info.scriptbuild)
+    $NewVersion = $($Version+1)
+    $ScriptConfig.config.info.scriptbuild = $NewVersion
     $ScriptConfig.Save('Script.Config.xml')
 
-    "# Project:       $ProjectName" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
+    "# Project:     $ProjectName" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
     "# Author:      $($ScriptConfig.config.info.author)" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
-    "# Version:     $NewVersion" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
+    "# BuildNumber: $NewVersion" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
     "# Description: $($ScriptConfig.config.info.description)" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
     Get-Content -Path "$SourceRoot\CurrentUserConsoleHost.ps1" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"    
 }

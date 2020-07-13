@@ -8,7 +8,7 @@
   </deployment>
   <info>
     <author>Thomas Barratt</author>
-    <scriptversion>4.3.246</scriptversion>
+    <scriptbuild>249</scriptbuild>
     <description>Powershell Profile Script</description>
   </info>
 </config>

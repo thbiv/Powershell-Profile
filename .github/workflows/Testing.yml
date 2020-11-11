@@ -12,6 +12,6 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v2
 
-      - name: Show folder structure
-        run: Get-ChildItem -Recurse
+      - name: Testing
+        run: Get-Module Pester -ListAvailable
         shell: pwsh

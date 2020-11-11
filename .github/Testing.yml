@@ -1,0 +1,17 @@
+name: Testing
+
+on:
+  push:
+    branches:
+      - nothing
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v2
+
+      - name: Show folder structure
+        run: Get-ChildItem -Recurse
+        shell: pwsh

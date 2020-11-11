@@ -15,7 +15,7 @@ jobs:
       - name: Testing
         run:  |
           Write-Host "Loading Config File"
-          [xml]$ModuleConfig = Get-Content Module.Config.xml
+          [xml]$ModuleConfig = Get-Content Script.Config.xml
           $RequiredModules = $ModuleConfig.config.requiredmodules.module
           ForEach ($Module in $RequiredModules) {
             Write-Host "  $($Module.name)"

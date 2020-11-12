@@ -1,0 +1,51 @@
+name: Script-Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Clone-Repository
+        uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run:  |
+          Write-Host "Loading Config File"
+          [xml]$ScriptConfig = Get-Content Script.Config.xml
+          $RequiredModules = $ScriptConfig.config.requiredmodules.module
+          ForEach ($Module in $RequiredModules) {
+            Write-Host "  $($Module.name)"
+            Write-Host "  - Installing..." -NoNewline
+            $Params = @{
+              Name = $($Module.name)
+              Scope = 'CurrentUser'
+              Force = $True
+              ErrorAction = 'STOP'
+            }
+            If ($Null -ne $Module.requiredversion) {$Params += @{RequiredVersion = $($Module.requiredversion)}}
+            Install-Module @Params
+            Write-Host "Done"
+          }
+        shell: pwsh
+
+      - name: Build
+        run: |
+          [xml]$ScriptConfig = Get-Content Module.Config.xml
+          $RequiredModules = $ScriptConfig.config.requiredmodules.module
+          ForEach ($Module in $RequiredModules) {
+            Write-Host "  $($Module.name)"
+            Write-Host "  - Importing..." -NoNewline
+            $Params = @{
+              Name = $($Module.name)
+              ErrorAction = 'STOP'
+            }
+            If ($Null -ne $Module.requiredversion) {$Params += @{RequiredVersion = $($Module.requiredversion)}}
+            Import-Module @Params
+            Write-Host "Done"
+          }
+          Invoke-Build -Task Testing 
+        shell: pwsh

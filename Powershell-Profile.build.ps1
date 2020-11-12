@@ -3,11 +3,10 @@ $Script:SourceRoot = "$BuildRoot\source"
 $Script:OutputRoot = "$BuildRoot\_output"
 $Script:TestResultsRoot = "$BuildRoot\_testresults"
 $Script:TestsRoot = "$BuildRoot\tests"
-$Script:FileHashRoot = "$BuildRoot\_filehash"
 $Script:DestinationScript = "$OutputRoot\$ScriptFileName"
 $Script:ScriptConfig = [xml]$(Get-Content -Path '.\Script.Config.xml')
 
-Task . Clean, Build, Test, Deploy
+Task . Clean, Build, Test
 Task Testing Clean, Build, Test
 
 # Synopsis: Empty the _output and _testresults folders
@@ -22,11 +21,6 @@ Task Clean {
 
 # Synopsis: Compile and build the project
 Task Build {
-    [int]$Version = $($ScriptConfig.config.info.scriptbuild)
-    $NewVersion = $($Version+1)
-    $ScriptConfig.config.info.scriptbuild = $NewVersion
-    $ScriptConfig.Save('Script.Config.xml')
-
     "# Project:     $ProjectName" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
     "# Author:      $($ScriptConfig.config.info.author)" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
     "# BuildNumber: $NewVersion" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"

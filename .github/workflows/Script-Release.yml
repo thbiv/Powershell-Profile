@@ -34,7 +34,7 @@ jobs:
 
       - name: Build
         run: |
-          [xml]$ScriptConfig = Get-Content Module.Config.xml
+          [xml]$ScriptConfig = Get-Content Script.Config.xml
           $RequiredModules = $ScriptConfig.config.requiredmodules.module
           ForEach ($Module in $RequiredModules) {
             Write-Host "  $($Module.name)"

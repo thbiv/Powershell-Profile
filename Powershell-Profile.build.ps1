@@ -13,9 +13,13 @@ Task Testing Clean, Build, Test
 Task Clean {
     If (Test-Path -Path $OutputRoot) {
         Get-ChildItem -Path $OutputRoot -Recurse | Remove-Item -Force
+    } Else {
+        New-Item -Path $OutputRoot -ItemType Directory -Force | Out-Null
     }
     If (Test-Path -Path $TestResultsRoot) {
         Get-ChildItem -Path $TestResultsRoot -Recurse | Remove-Item -Force
+    } Else {
+        New-Item -Path $TestResultsRoot -ItemType Directory -Force | Out-Null
     }
 }
 

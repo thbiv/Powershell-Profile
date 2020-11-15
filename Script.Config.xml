@@ -1,11 +1,4 @@
 <config>
-  <deployment>
-    <destinations>
-      <destination>C:\Users\thbarratt\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1</destination>
-      <destination>C:\Users\thbarratt\Documents\PowerShell\Microsoft.PowerShell_profile.ps1</destination>
-    </destinations>
-    <testresults>C:\Users\thbarratt\Documents\TestResults\Powershell-Profile</testresults>
-  </deployment>
   <info>
     <author>Thomas Barratt</author>
     <scriptbuild>249</scriptbuild>

@@ -7,7 +7,6 @@ $Script:DestinationScript = "$OutputRoot\$ScriptFileName"
 $Script:ScriptConfig = [xml]$(Get-Content -Path '.\Script.Config.xml')
 
 Task . Clean, Build, Test
-Task Testing Clean, Build, Test
 
 # Synopsis: Empty the _output and _testresults folders
 Task Clean {
@@ -27,12 +26,15 @@ Task Clean {
 Task Build {
     "# Project:     $ProjectName" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
     "# Author:      $($ScriptConfig.config.info.author)" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
-    "# BuildNumber: $NewVersion" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
+    "# BuildNumber: $($ScriptConfig.config.info.scriptbuild)" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
     "# Description: $($ScriptConfig.config.info.description)" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
     Get-Content -Path "$SourceRoot\CurrentUserConsoleHost.ps1" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
     
     $Content = Get-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
-    $Content | ForEach-Object {$_.TrimEnd()} | Set-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1" -Force
+    $Content | ForEach-Object {$_.TrimEnd()} | Set-Content -Path "$OutputRoot\Microsoft.PowerShell_profile.ps1" -Force
+
+    $ZipName = "{0}_Build-{1}.zip" -f $ProjectName, $($ScriptConfig.config.info.scriptbuild)
+    Compress-Archive -Path "$OutputRoot\Microsoft.PowerShell_profile.ps1" -DestinationPath "$OutputRoot\$ZipName"
 }
 
 # Synopsis: Test the Project
@@ -52,9 +54,4 @@ Task Test {
     If ($PSSAResults.FailedCount -ne 0) {Throw "PSScriptAnalyzer Test Failed"}
     ElseIf ($BasicResults.FailedCount -ne 0) {Throw "Basic Test Failed"}
     Else {Write-Host "All tests have passed...Build can continue."}
-}
-
-# Synopsis: Deploy Powershell Profiles
-Task Deploy {
-    Invoke-PSDeploy -Force
 }

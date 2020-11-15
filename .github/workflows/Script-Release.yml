@@ -59,26 +59,31 @@ jobs:
           }
           Invoke-Build
         shell: pwsh
+      
+      - name: Test-Folder-Structure
+        run: |
+          Get-ChildItem -Recurse
+        shell: pwsh
 
-      - name: Create-Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ env.ScriptBuildNumber }}
-          release_name: Build ${{ env.ScriptBuildNumber }}
-          body: Build ${{ env.ScriptBuildNumber }}
-          draft: false
-          prerelease: false
+      #- name: Create-Release
+      #  id: create_release
+      #  uses: actions/create-release@v1
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #  with:
+      #    tag_name: ${{ env.ScriptBuildNumber }}
+      #    release_name: Build ${{ env.ScriptBuildNumber }}
+      #    body: Build ${{ env.ScriptBuildNumber }}
+      #    draft: false
+      #    prerelease: false
 
-      - name: Upload-Release-Asset
-        id: upload_release_asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url:  ${{ steps.create_release.outputs.upload_url }}
-          asset_path: _output\${{ env.GH_PROJECTNAME }}_${{ env.ScriptBuildNumber }}.zip
-          asset_name: ${{ env.GH_PROJECTNAME }}_${{ env.ScriptBuildNumber }}.zip
-          asset_content_type: application/zip
+      #- name: Upload-Release-Asset
+      #  id: upload_release_asset
+      #  uses: actions/upload-release-asset@v1
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #  with:
+      #    upload_url:  ${{ steps.create_release.outputs.upload_url }}
+      #    asset_path: _output\${{ env.GH_PROJECTNAME }}_${{ env.ScriptBuildNumber }}.zip
+      #    asset_name: ${{ env.GH_PROJECTNAME }}_${{ env.ScriptBuildNumber }}.zip
+      #    asset_content_type: application/zip

@@ -163,18 +163,3 @@ Function Install-Powershell {
         Invoke-Expression "&{$(Invoke-RestMethod https://aka.ms/install-powershell.ps1)} -UseMSI -Quiet"
     }
 }
-
-# Check if there is a newer version of Powershell available and ask to install if there is.
-If ($($Host.Version) -ne $((Get-PwshLatestRelease).Version)) {
-    Write-Host "A new version of Powershell is available: $((Get-PwshLatestRelease).Version)"
-    $Yes = New-Object System.Management.Automation.Host.ChoiceDescription '&Yes'
-    $No = New-Object System.Management.Automation.Host.ChoiceDescription '&No'
-    $Options = [System.Management.Automation.Host.ChoiceDescription[]]($Yes, $No)
-    $Title = 'Install Powershell'
-    $Message = 'Do you want to Install the new veriosn of Powershell?'
-    $Result = $host.ui.PromptForChoice($Title, $Message, $Options, 0)
-    Switch ($Result) {
-        0 { & Sudo Install-Powershell }
-        1 {}
-    }
-}

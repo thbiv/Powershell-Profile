@@ -33,7 +33,7 @@ Task Build {
     $Content = Get-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
     $Content | ForEach-Object {$_.TrimEnd()} | Set-Content -Path "$OutputRoot\Microsoft.PowerShell_profile.ps1" -Force
 
-    $ZipName = "{0}_Build-{1}.zip" -f $ProjectName, $($ScriptConfig.config.info.scriptbuild)
+    $ZipName = "{0}_{1}.zip" -f $ProjectName, $($ScriptConfig.config.info.scriptbuild)
     Compress-Archive -Path "$OutputRoot\Microsoft.PowerShell_profile.ps1" -DestinationPath "$OutputRoot\$ZipName"
 }
 

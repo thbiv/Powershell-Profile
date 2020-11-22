@@ -27,7 +27,7 @@ New-Alias sudo "gsudo"
 New-Alias npp   "C:\Program Files\Notepad++\notepad++.exe" #Notepad++
 
 # Posh-Git Settings
-$GitPromptSettings.WindowTitle = ""
+$GitPromptSettings.EnableWindowTitle = ""
 $GitPromptSettings.ShowStatusWhenZero = $false
 
 # Custom Prompt

@@ -41,7 +41,7 @@ Function Prompt {
     Write-Host ("$env:USERNAME" + '@' + "$env:COMPUTERNAME") -ForegroundColor White -BackgroundColor DarkGray -NoNewline
     If (Get-GitDirectory -ne $Null) {
         Write-Host " " -NoNewline
-        Write-Host "$((Get-GitStatus).RepoName)" -ForegroundColor White -BackgroundColor DarkGreen -NoNewline
+        Write-Host "$(Split-path -Path $(Get-Location) -Leaf)" -ForegroundColor White -BackgroundColor DarkGreen -NoNewline
         Write-Host "$(Write-VcsStatus)"
     } Else {
         Write-Host ""

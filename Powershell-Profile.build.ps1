@@ -28,7 +28,7 @@ Task Build {
     "# Author:      $($ScriptConfig.config.info.author)" | Add-Content -Path "$OutputRoot\Profile.ps1"
     "# BuildNumber: $($ScriptConfig.config.info.scriptbuild)" | Add-Content -Path "$OutputRoot\Profile.ps1"
     "# Description: $($ScriptConfig.config.info.description)" | Add-Content -Path "$OutputRoot\Profile.ps1"
-    Get-Content -Path "$SourceRoot\Profile.ps1.ps1" | Add-Content -Path "$OutputRoot\Profile.ps1"
+    Get-Content -Path "$SourceRoot\Profile.ps1" | Add-Content -Path "$OutputRoot\Profile.ps1"
     
     $Content = Get-Content -Path "$OutputRoot\Profile.ps1"
     $Content | ForEach-Object {$_.TrimEnd()} | Set-Content -Path "$OutputRoot\Profile.ps1" -Force

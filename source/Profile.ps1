@@ -1,30 +1,44 @@
-# Import Modules
-Import-Module -Name PSReadLine, posh-git, PSScriptTools
-Import-Module -Name Pscx -Function help, less, Show-Tree, Start-PowerShell -Cmdlet ConvertFrom-Base64, ConvertTo-Base64
-Import-Module -Name PowerShellCookbook -Function Show-Object
-
-# Variables
-# Add the gsudo executable directory to the PATH variable
-Add-PathVariable 'C:\ProgramData\chocolatey\lib\gsudo\bin\'
-
-# Variable for the path where this profile script is located
-New-Variable -Name PSProfileScriptPath -Value $(Split-Path $Profile) -Option Constant -Scope Script
-
-# Variable for paths to the Powershell Scripts folders (Paths where scripts are installed from the PSGallery)
-New-Variable -Name PSScripts -Option Constant -Scope Global -Value @{
-    CurrentUser = "$PSProfileScriptPath\Scripts"
-    AllUsers = "$Env:ProgramFiles" + "\Powershell\Scripts"
+If ($IsWindows) {
+    New-Variable -Name IsAdmin -Option Constant -Scope Global -Value $(([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
 }
 
-#Variable for checking if this session has Administrator access
-New-Variable -Name IsAdmin -Option Constant -Scope Global -Value $(([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator))
+If ($($PSVersionTable.PSVersion) -Match "^[1-5]") {
+    $IsWindowsPowershell = $True
+} Else {
+    $IsWindowsPowershell = $False
+}
+
+# Import Modules
+Import-Module -Name PSReadLine, posh-git, PSScriptTools
+
+# Variables
+# Variable for paths to the Powershell Scripts folders (Paths where scripts are installed from the PSGallery)
+If ($IsWindows) {
+    If ($IsWindowsPowershell) {
+        $CU = "$Home\Documents\WindowsPowershell\Scripts"
+        $AU = "$Env:ProgramFiles" + "\WindowsPowershell\Scripts"
+    } Else {
+        $CU = "$Home\Documents\Powershell\Scripts"
+        $AU = "$Env:ProgramFiles" + "\Powershell\Scripts"
+    }
+} Else {
+    $CU = "$Home/.local/share/powershell/Scripts"
+    $AU = "/usr/local/share/powershell/Scripts"
+}
+New-Variable -Name PSScripts -Option Constant -Scope Global -Value @{
+    CurrentUser = $CU
+    AllUsers = $AU
+}
 
 # Aliases
-# calling the gsudo tool with 'sudo'
-New-Alias sudo "gsudo"
 
-# Calling Notepad++ using npp
-New-Alias npp   "C:\Program Files\Notepad++\notepad++.exe" #Notepad++
+If ($IsWindows) {
+    # Calling Notepad++ using npp
+    New-Alias -Name npp -Value "C:\Program Files\Notepad++\notepad++.exe"
+
+    # Use the Less pager utility that comes with Git.
+    New-Alias -Name less -Value "C:\Program Files\Git\usr\bin\less.exe"
+}
 
 # Posh-Git Settings
 $GitPromptSettings.EnableWindowTitle = ""
@@ -38,7 +52,7 @@ Function Prompt {
     }
     Write-Host "$(Get-Date -Format 'MM/dd/yyyy HH:mm:ss')" -ForegroundColor White -BackgroundColor Blue -NoNewline
     Write-Host " " -NoNewline
-    Write-Host ("$env:USERNAME" + '@' + "$env:COMPUTERNAME") -ForegroundColor White -BackgroundColor DarkGray -NoNewline
+    Write-Host ("$([environment]::UserName)" + '@' + "$([environment]::MachineName)") -ForegroundColor White -BackgroundColor DarkGray -NoNewline
     If (Get-GitDirectory -ne $Null) {
         Write-Host " " -NoNewline
         Write-Host "$(Split-path -Path $(Get-Location) -Leaf)" -ForegroundColor White -BackgroundColor DarkGreen -NoNewline
@@ -53,19 +67,7 @@ Function Prompt {
 }
 
 # Load PSReadLine Profile
-. $PSProfileScriptPath\PSReadlineProfile.ps1
-
-# Register PSLocalGallery if it does not exist
-If (!(Get-PSRepository -Name PSLocalGallery -ErrorAction SilentlyContinue)) {
-    $PSLocalGalleryPath = "C:\ProgramData\PSLocaLGallery\Repository"
-    $Repo = @{
-        Name = 'PSLocalGallery'
-        SourceLocation = $PSLocalGalleryPath
-        PublishLocation = $PSLocalGalleryPath
-        InstallationPolicy = 'Trusted'
-    }
-    Register-PSRepository @Repo
-}
+. $PSScriptRoot\PSReadlineProfile.ps1
 
 # Update Help if Administrator
 If ($IsAdmin) {
@@ -88,26 +90,6 @@ For ($i = 1; $i -le 5; $i++) {
     $d =  $u.Replace("u","../")
     Invoke-Expression "Function $u { Push-Location $d }"
     Invoke-Expression "Function $unum { Push-Location $d }"
-}
-
-# Function for retrieving the latest release version of Powershell
-Function Get-PwshLatestRelease {
-    $Params = @{
-        'Uri' = 'https://api.github.com/repos/Powershell/Powershell/releases/latest'
-        'Headers' = @{"Accept"="application/json"}
-        'Method' = 'Get'
-        'UseBasicParsing' = $True
-    }
-    $Response = Invoke-RestMethod @Params
-    $Winx64Asset = $Response.assets | Where-Object {$_.name -like "*win-x64.zip"}
-
-    $Props = [ordered]@{
-        'Name' = $($Response.name)
-        'Version' = $(($Response.tag_name).TrimStart('v'))
-        'PublishedDate' = $($Response.published_at)
-        'DownloadURL' = $($Winx64Asset.browser_download_url)
-    }
-    New-Object -TypeName PSObject -Property $Props
 }
 
 # Function to start and enter a PSRemoting session
@@ -135,10 +117,3 @@ Function Convert-SIDToUserName {
 # Color Get-ChildItem filesystem Output using PSScriptTools module
 $FormatFile = (Get-Module PSScriptTools).ExportedFormatFiles | where-object {$_ -match 'filesystem-ansi'}
 Update-FormatData -PrependPath $FormatFile
-
-# Function to invoke the install-powershell.ps1 script to install the latest version of powershell
-Function Install-Powershell {
-    If (([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-        Invoke-Expression "&{$(Invoke-RestMethod https://aka.ms/install-powershell.ps1)} -UseMSI -Quiet"
-    }
-}

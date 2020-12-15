@@ -24,17 +24,17 @@ Task Clean {
 
 # Synopsis: Compile and build the project
 Task Build {
-    "# Project:     $ProjectName" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
-    "# Author:      $($ScriptConfig.config.info.author)" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
-    "# BuildNumber: $($ScriptConfig.config.info.scriptbuild)" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
-    "# Description: $($ScriptConfig.config.info.description)" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
-    Get-Content -Path "$SourceRoot\CurrentUserConsoleHost.ps1" | Add-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
+    "# Project:     $ProjectName" | Add-Content -Path "$OutputRoot\Profile.ps1"
+    "# Author:      $($ScriptConfig.config.info.author)" | Add-Content -Path "$OutputRoot\Profile.ps1"
+    "# BuildNumber: $($ScriptConfig.config.info.scriptbuild)" | Add-Content -Path "$OutputRoot\Profile.ps1"
+    "# Description: $($ScriptConfig.config.info.description)" | Add-Content -Path "$OutputRoot\Profile.ps1"
+    Get-Content -Path "$SourceRoot\Profile.ps1.ps1" | Add-Content -Path "$OutputRoot\Profile.ps1"
     
-    $Content = Get-Content -Path "$OutputRoot\CurrentUserConsoleHost.ps1"
-    $Content | ForEach-Object {$_.TrimEnd()} | Set-Content -Path "$OutputRoot\Microsoft.PowerShell_profile.ps1" -Force
+    $Content = Get-Content -Path "$OutputRoot\Profile.ps1"
+    $Content | ForEach-Object {$_.TrimEnd()} | Set-Content -Path "$OutputRoot\Profile.ps1" -Force
 
     $ZipName = "{0}_{1}.zip" -f $ProjectName, $($ScriptConfig.config.info.scriptbuild)
-    Compress-Archive -Path "$OutputRoot\Microsoft.PowerShell_profile.ps1" -DestinationPath "$OutputRoot\$ZipName"
+    Compress-Archive -Path "$OutputRoot\Profile.ps1" -DestinationPath "$OutputRoot\$ZipName"
 }
 
 # Synopsis: Test the Project

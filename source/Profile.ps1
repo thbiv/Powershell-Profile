@@ -9,7 +9,10 @@ If ($($PSVersionTable.PSVersion) -Match "^[1-5]") {
 }
 
 # Import Modules
-Import-Module -Name PSReadLine, posh-git, PSScriptTools
+Import-Module -Name PSReadLine, posh-git
+If ($IsWindows) {
+    Import-Module -Name PSScriptTools
+}
 
 # Variables
 # Variable for paths to the Powershell Scripts folders (Paths where scripts are installed from the PSGallery)
@@ -66,8 +69,12 @@ Function Prompt {
     "PS> "
 }
 
-# Load PSReadLine Profile
-. $PSScriptRoot\PSReadlineProfile.ps1
+# Load any scripts that i want to include while loading the profile. Scripts planced in the $PSScriptRoot\ProfileInclude
+If (Test-Path -Path "$PSScriptRoot\ProfileInclude") {
+    ForEach ($Item in $(Get-ChildItem -Path "$PSScriptRoot\ProfileInclude" | Select-Object -ExpandProperty FullName)) {
+        . $Item
+    }
+}
 
 # Update Help if Administrator
 If ($IsAdmin) {
@@ -106,14 +113,16 @@ Function New-PSRemoteSession {
 }
 New-Alias -Name psrem -Value New-PSRemoteSession
 
-# Function to output a username from the input of a SID
-Function Convert-SIDToUserName {
-    Param(
-        $SID
-    )
-    ((((New-Object System.Security.Principal.SecurityIdentifier($SID)).Translate([System.Security.Principal.NTAccount])).Value).Split('\'))[1]
-}
+If ($IsWindows) {
+    # Function to output a username from the input of a SID
+    Function Convert-SIDToUserName {
+        Param(
+            $SID
+        )
+        ((((New-Object System.Security.Principal.SecurityIdentifier($SID)).Translate([System.Security.Principal.NTAccount])).Value).Split('\'))[1]
+    }
 
-# Color Get-ChildItem filesystem Output using PSScriptTools module
-$FormatFile = (Get-Module PSScriptTools).ExportedFormatFiles | where-object {$_ -match 'filesystem-ansi'}
-Update-FormatData -PrependPath $FormatFile
+    # Color Get-ChildItem filesystem Output using PSScriptTools module
+    $FormatFile = (Get-Module PSScriptTools).ExportedFormatFiles | where-object {$_ -match 'filesystem-ansi'}
+    Update-FormatData -PrependPath $FormatFile
+}

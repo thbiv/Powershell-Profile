@@ -41,6 +41,9 @@ If ($IsWindows) {
 
     # Use the Less pager utility that comes with Git.
     New-Alias -Name less -Value "C:\Program Files\Git\usr\bin\less.exe"
+
+    # Use the Nano terminal text editor that comes with Git.
+    New-Alias -Name nano -Value "C:\Program Files\Git\usr\bin\nano.exe"
 }
 
 # Posh-Git Settings

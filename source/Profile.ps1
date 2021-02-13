@@ -32,6 +32,7 @@ New-Variable -Name PSScripts -Option Constant -Scope Global -Value @{
     CurrentUser = $CU
     AllUsers = $AU
 }
+Remove-Variable CU,AU
 
 # Add the Scripts folders to the PATH Environment Variable
 $NewPaths = @("$($PSScripts.AllUsers)","$($PSScripts.CurrentUser)")

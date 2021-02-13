@@ -33,6 +33,12 @@ New-Variable -Name PSScripts -Option Constant -Scope Global -Value @{
     AllUsers = $AU
 }
 
+# Add the Scripts folders to the PATH Environment Variable
+$NewPaths = @("$($PSScripts.AllUsers)","$($PSScripts.CurrentUser)")
+$PATHArray = $env:Path -split ';'
+$Env:PATH = ($PATHArray + $NewPaths) -join ';'
+Remove-Variable NewPaths,PATHArray
+
 # Aliases
 
 If ($IsWindows) {
@@ -76,6 +82,7 @@ Function Prompt {
 If (Test-Path -Path "$PSScriptRoot\ProfileInclude") {
     ForEach ($Item in $(Get-ChildItem -Path "$PSScriptRoot\ProfileInclude" | Select-Object -ExpandProperty FullName)) {
         . $Item
+        Write-Host "Loaded Script: $Item"
     }
 }
 

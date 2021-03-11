@@ -9,3 +9,11 @@
 ## Synopsis
 
 My Personal Powershell Profile
+
+## Installation
+
+This command will install the Powershell profile as well as the PSReadline profile from github.com/thbiv/PSReadline-Profile.
+
+```Powershell
+iex $((iwr https://raw.githubusercontent.com/thbiv/Powershell-Profile/master/Install.ps1).Content)
+```

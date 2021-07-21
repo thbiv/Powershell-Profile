@@ -51,6 +51,9 @@ If ($IsWindows) {
 
     # Use the Nano terminal text editor that comes with Git.
     New-Alias -Name nano -Value "C:\Program Files\Git\usr\bin\nano.exe"
+
+    # Winfetch
+    Set-Alias -Name winfetch -Value pwshfetch-test-1
 }
 
 # Posh-Git Settings

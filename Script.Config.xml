@@ -1,7 +1,7 @@
 <config>
   <info>
     <author>Thomas Barratt</author>
-    <scriptbuild>259</scriptbuild>
+    <scriptbuild>260</scriptbuild>
     <description>Powershell Profile Script</description>
   </info>
   <requiredmodules>

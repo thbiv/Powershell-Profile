@@ -56,32 +56,6 @@ If ($IsWindows) {
     Set-Alias -Name winfetch -Value pwshfetch-test-1
 }
 
-# Posh-Git Settings
-$GitPromptSettings.EnableWindowTitle = ""
-$GitPromptSettings.ShowStatusWhenZero = $false
-
-# Custom Prompt
-Function Prompt {
-    If ($IsAdmin) {
-        Write-Host "Admin" -ForegroundColor White -BackgroundColor Red -NoNewline
-        Write-Host " " -NoNewline
-    }
-    Write-Host "$(Get-Date -Format 'MM/dd/yyyy HH:mm:ss')" -ForegroundColor White -BackgroundColor Blue -NoNewline
-    Write-Host " " -NoNewline
-    Write-Host ("$([environment]::UserName)" + '@' + "$([environment]::MachineName)") -ForegroundColor White -BackgroundColor DarkGray -NoNewline
-    If (Get-GitDirectory -ne $Null) {
-        Write-Host " " -NoNewline
-        Write-Host "$(Split-path -Path $(Get-Location) -Leaf)" -ForegroundColor White -BackgroundColor DarkGreen -NoNewline
-        Write-Host "$(Write-VcsStatus)"
-    } Else {
-        Write-Host ""
-    }
-    Write-Host $((Get-Location).Path) -ForegroundColor Yellow
-    Write-Host "$((Get-ChildItem).Count)" -ForegroundColor Blue -NoNewline
-    Write-Host " " -NoNewline
-    "PS> "
-}
-
 # Load any scripts that i want to include while loading the profile. Scripts planced in the $PSScriptRoot\ProfileInclude
 If (Test-Path -Path "$PSScriptRoot\ProfileInclude") {
     ForEach ($Item in $(Get-ChildItem -Path "$PSScriptRoot\ProfileInclude" | Select-Object -ExpandProperty FullName)) {
@@ -139,4 +113,8 @@ If ($IsWindows) {
     # Color Get-ChildItem filesystem Output using PSScriptTools module
     $FormatFile = (Get-Module PSScriptTools).ExportedFormatFiles | where-object {$_ -match 'filesystem-ansi'}
     Update-FormatData -PrependPath $FormatFile
+
+    # Use Oh-My-Posh for the Prompt
+    oh-my-posh init pwsh --config "$Home\Documents\thbiv.omp.json" | Invoke-Expression
+    Enable-PoshTransientPrompt
 }
